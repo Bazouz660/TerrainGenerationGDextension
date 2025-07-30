@@ -1,0 +1,39 @@
+[gd_resource type="ShaderMaterial" load_steps=11 format=3 uid="uid://dhg8vtc1kvpqi"]
+
+[ext_resource type="Shader" uid="uid://c6wkysa4gx5fu" path="res://shader/terrain.gdshader" id="1_c8yqh"]
+[ext_resource type="Texture2D" uid="uid://dwkyu7yi8ncwj" path="res://material/sand/ground_0024_normal_opengl_2k.png" id="2_64fqj"]
+[ext_resource type="Texture2D" uid="uid://bgurii7wbrmb7" path="res://material/cliff-rockface1nUnreal-Engine/cliff-rockface1_Normal.png" id="2_hlu1x"]
+[ext_resource type="Texture2D" uid="uid://bjh3mgitgbkse" path="res://material/cliff-rockface1nUnreal-Engine/cliff-rockface1_Roughness.png" id="3_c8yqh"]
+[ext_resource type="Texture2D" uid="uid://dj0fhxf1pnqm5" path="res://material/sand/ground_0024_roughness_2k.jpg" id="3_plnjq"]
+[ext_resource type="Texture2D" uid="uid://g5iftfp8o2ki" path="res://material/sand/ground_0024_color_2k.jpg" id="4_ldit7"]
+[ext_resource type="Texture2D" uid="uid://k6v1d6ru3hr" path="res://material/cliff-rockface1nUnreal-Engine/cliff-rockface1_albedo.png" id="4_re61t"]
+[ext_resource type="Texture2D" uid="uid://drhnatld4aspa" path="res://material/grass/patchy-meadow1_normal-dx.png" id="6_613x6"]
+[ext_resource type="Texture2D" uid="uid://bi233uag6cwkq" path="res://material/grass/patchy-meadow1_roughness.png" id="7_7rpve"]
+[ext_resource type="Texture2D" uid="uid://cxe3jrfsq13ib" path="res://material/stylized-grass1-ue/stylized-grass1_albedo.png" id="7_vtyro"]
+
+[resource]
+render_priority = 0
+shader = ExtResource("1_c8yqh")
+shader_parameter/top_texture = ExtResource("7_vtyro")
+shader_parameter/top_normal = ExtResource("6_613x6")
+shader_parameter/top_roughness = ExtResource("7_7rpve")
+shader_parameter/bottom_texture = ExtResource("4_re61t")
+shader_parameter/bottom_normal = ExtResource("2_hlu1x")
+shader_parameter/bottom_roughness = ExtResource("3_c8yqh")
+shader_parameter/beach_texture = ExtResource("4_ldit7")
+shader_parameter/beach_normal = ExtResource("2_64fqj")
+shader_parameter/beach_roughness = ExtResource("3_plnjq")
+shader_parameter/slope_threshold = 0.8
+shader_parameter/slope_transition = 0.05
+shader_parameter/use_world_normal = true
+shader_parameter/water_level = -14.1
+shader_parameter/beach_transition = 3.5
+shader_parameter/uv_top_blend_sharpness = 1.0
+shader_parameter/uv_top_scale = Vector3(1, 1, 1)
+shader_parameter/uv_top_offset = Vector3(0, 0, 0)
+shader_parameter/uv_bottom_blend_sharpness = 1.0
+shader_parameter/uv_bottom_scale = Vector3(1, 1, 1)
+shader_parameter/uv_bottom_offset = Vector3(0, 0, 0)
+shader_parameter/uv_beach_blend_sharpness = 1.0
+shader_parameter/uv_beach_scale = Vector3(1, 1, 1)
+shader_parameter/uv_beach_offset = Vector3(0, 0, 0)

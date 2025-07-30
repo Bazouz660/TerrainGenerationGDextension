@@ -1,0 +1,56 @@
+# Godot 4+ specific ignores
+*.godot/
+*/android/
+*/build/
+*.vscode/
+*.tmp
+*.uid
+## C++ ignores
+# Build output
+*.obj
+*.o
+*.so
+*.a
+*.lib
+*.dll
+*.exe
+*.exp
+*.pdb
+*.idb
+*.class
+# IDE/project files
+.vs/
+.idea/
+*.sln
+*.vcxproj*
+*.xcodeproj
+*.DS_Store
+cmake-build-*/
+CMakeFiles/
+CMakeCache.txt
+Makefile
+build/
+bin/
+Debug/
+Release/
+out/
+*.log
+*.user
+*.swp
+*.swo
+*.bak
+*.tmp
+*.cache
+*.gch
+*.ipch
+*.pch
+*.tlog
+*.lastbuildstate
+*.opensdf
+*.sdf
+*.VC.db
+*.VC.opendb
+*.vscode/
+*.clangd/
+compile_commands.json
+tags

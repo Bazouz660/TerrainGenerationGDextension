@@ -1,0 +1,183 @@
+[gd_scene load_steps=30 format=3 uid="uid://bxvbkug3fxjph"]
+
+[ext_resource type="Script" uid="uid://4e34v7q7d67s" path="res://script/node_3d.gd" id="1_eypwc"]
+[ext_resource type="Texture2D" uid="uid://1cmwwf6ge0ib" path="res://config/continentalness_noise.tres" id="2_bl5v0"]
+[ext_resource type="Material" uid="uid://dhg8vtc1kvpqi" path="res://material/terrain.tres" id="2_ibbop"]
+[ext_resource type="Script" uid="uid://cb0hfinpeh4a0" path="res://script/free_camera.gd" id="3_18udm"]
+[ext_resource type="PackedScene" uid="uid://bo5u166pny0f8" path="res://scene/tree.tscn" id="3_ibbop"]
+[ext_resource type="Texture2D" uid="uid://css7p86old5nw" path="res://config/peaks_and_valleys_noise.tres" id="3_v1e8f"]
+[ext_resource type="Shader" uid="uid://bb6pwryg8spmt" path="res://shader/water.gdshader" id="4_vmwkm"]
+[ext_resource type="Texture2D" uid="uid://dwxi3p3blv0vx" path="res://config/erosion_noise.tres" id="4_vw0me"]
+[ext_resource type="Script" uid="uid://bjft33y76b7yg" path="res://script/mesh_instance_3d_2.gd" id="5_bl5v0"]
+[ext_resource type="Curve" uid="uid://clnobnidjymvg" path="res://config/continentalness_curve.tres" id="5_v1e8f"]
+[ext_resource type="Curve" uid="uid://e4kby52nwc8i" path="res://config/peaks_and_valleys_curve.tres" id="6_c6r6v"]
+[ext_resource type="PackedScene" uid="uid://wifvsqggytxt" path="res://model/bulky_knight/bulky_knight.glb" id="6_v1e8f"]
+[ext_resource type="Curve" uid="uid://cbhmaiehsuqi5" path="res://config/erosion_curve.tres" id="7_v01n7"]
+
+[sub_resource type="Gradient" id="Gradient_i5arm"]
+offsets = PackedFloat32Array(0.496907, 0.890722)
+
+[sub_resource type="FastNoiseLite" id="FastNoiseLite_wc5p8"]
+frequency = 0.0131
+fractal_octaves = 3
+
+[sub_resource type="NoiseTexture2D" id="NoiseTexture2D_jsk3o"]
+seamless = true
+seamless_blend_skirt = 1.0
+color_ramp = SubResource("Gradient_i5arm")
+noise = SubResource("FastNoiseLite_wc5p8")
+
+[sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_4xowi"]
+sky_top_color = Color(0, 0.433675, 0.840774, 1)
+sky_horizon_color = Color(0.516691, 0.660186, 0.889366, 1)
+sky_energy_multiplier = 1.2
+sky_cover = SubResource("NoiseTexture2D_jsk3o")
+sun_angle_max = 216.66
+sun_curve = 0.0675936
+
+[sub_resource type="Sky" id="Sky_a202f"]
+sky_material = SubResource("ProceduralSkyMaterial_4xowi")
+process_mode = 1
+
+[sub_resource type="Environment" id="Environment_noarx"]
+background_mode = 2
+sky = SubResource("Sky_a202f")
+ambient_light_source = 3
+ambient_light_color = Color(0.650128, 0.650128, 0.650128, 1)
+reflected_light_source = 2
+tonemap_mode = 4
+ssr_enabled = true
+ssao_enabled = true
+ssil_enabled = true
+glow_enabled = true
+glow_normalized = true
+volumetric_fog_enabled = true
+volumetric_fog_density = 0.003
+volumetric_fog_albedo = Color(1, 0.974473, 0.888855, 1)
+volumetric_fog_ambient_inject = 1.0
+volumetric_fog_sky_affect = 0.5
+
+[sub_resource type="CameraAttributesPractical" id="CameraAttributesPractical_i5arm"]
+dof_blur_far_enabled = true
+dof_blur_far_distance = 1000.0
+dof_blur_far_transition = 3000.0
+dof_blur_near_transition = -1.0
+dof_blur_amount = 0.05
+
+[sub_resource type="CapsuleMesh" id="CapsuleMesh_noarx"]
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_r3fl7"]
+size = Vector2(5000, 5000)
+
+[sub_resource type="FastNoiseLite" id="FastNoiseLite_i5arm"]
+
+[sub_resource type="NoiseTexture2D" id="NoiseTexture2D_wc5p8"]
+generate_mipmaps = false
+seamless = true
+noise = SubResource("FastNoiseLite_i5arm")
+
+[sub_resource type="Curve" id="Curve_6iypd"]
+_data = [Vector2(0, 0), 0.0, 0.0, 0, 0, Vector2(1, 1), 0.0, 0.0, 0, 0]
+point_count = 2
+
+[sub_resource type="CurveTexture" id="CurveTexture_tereu"]
+curve = SubResource("Curve_6iypd")
+
+[sub_resource type="FastNoiseLite" id="FastNoiseLite_cdqbm"]
+seed = 780
+frequency = 0.0069
+fractal_type = 2
+
+[sub_resource type="NoiseTexture2D" id="NoiseTexture2D_imku0"]
+width = 1024
+height = 1024
+seamless = true
+as_normal_map = true
+bump_strength = 4.0
+noise = SubResource("FastNoiseLite_cdqbm")
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_i5arm"]
+render_priority = 0
+shader = ExtResource("4_vmwkm")
+shader_parameter/absorption_color = Color(1, 0.71416, 0.615381, 1)
+shader_parameter/fresnel_radius = 2.0
+shader_parameter/fresnel_color = Color(4.04298e-06, 0.56779, 0.712761, 1)
+shader_parameter/roughness = 0.15
+shader_parameter/specular = 0.25
+shader_parameter/depth_distance = 25.0
+shader_parameter/beers_law = 0.8
+shader_parameter/displacement_strength = 0.3
+shader_parameter/displacement_scroll_speed = 0.1
+shader_parameter/displacement_scroll_offset = Vector2(-0.2, 0.3)
+shader_parameter/displacement_scale_offset = 0.5
+shader_parameter/displacement_scale = Vector2(0.04, 0.04)
+shader_parameter/edge_thickness = 0.3
+shader_parameter/edge_speed = 0.35
+shader_parameter/edge_noise_scale = Vector2(0.4, 0.4)
+shader_parameter/edge_noise = SubResource("NoiseTexture2D_wc5p8")
+shader_parameter/edge_ramp = SubResource("CurveTexture_tereu")
+shader_parameter/caustic_size = 2.0
+shader_parameter/caustic_range = 40.0
+shader_parameter/caustic_strength = 0.08
+shader_parameter/ssr_mix_strength = 0.65
+shader_parameter/ssr_travel = 300.0
+shader_parameter/ssr_resolution_near = 5.0
+shader_parameter/ssr_resolution_far = 10.0
+shader_parameter/ssr_tolerance = 2.0
+shader_parameter/refraction_strength = 1.25
+shader_parameter/normal_map_strength = 1.0
+shader_parameter/scroll_speed = 0.05
+shader_parameter/scroll_offset = Vector2(0.1, -0.3)
+shader_parameter/scale_offset = 0.5
+shader_parameter/normal_map_scale = Vector2(0.1, 0.1)
+shader_parameter/normal_map = SubResource("NoiseTexture2D_imku0")
+
+[node name="Node3D" type="Node3D" node_paths=PackedStringArray("terrain_generator")]
+script = ExtResource("1_eypwc")
+terrain_generator = NodePath("TerrainGenerator")
+
+[node name="TerrainGenerator" type="TerrainGenerator" parent="."]
+width = 32
+segment_count = 32
+origin_node_path = NodePath("../Camera3D")
+continentalness_texture = ExtResource("2_bl5v0")
+peaks_and_valleys_texture = ExtResource("3_v1e8f")
+erosion_texture = ExtResource("4_vw0me")
+continentalness_curve = ExtResource("5_v1e8f")
+peaks_and_valleys_curve = ExtResource("6_c6r6v")
+erosion_curve = ExtResource("7_v01n7")
+terrain_material = ExtResource("2_ibbop")
+_view_distance = 20
+foliage_scene = ExtResource("3_ibbop")
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Environment_noarx")
+camera_attributes = SubResource("CameraAttributesPractical_i5arm")
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
+transform = Transform3D(0.846193, -0.131468, -0.516405, 0.532876, 0.208767, 0.820036, -2.67027e-08, -0.969089, 0.246713, 0, 0, 0)
+shadow_enabled = true
+directional_shadow_split_1 = 0.05
+directional_shadow_blend_splits = true
+directional_shadow_max_distance = 700.0
+
+[node name="Camera3D" type="Camera3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 5.88254, 3.57339)
+script = ExtResource("3_18udm")
+movement_speed = 20.0
+sprint_speed = 200.0
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.06951, -14.1588, -305.338)
+mesh = SubResource("CapsuleMesh_noarx")
+
+[node name="MeshInstance3D2" type="MeshInstance3D" parent="." node_paths=PackedStringArray("camera")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -15, 0)
+mesh = SubResource("PlaneMesh_r3fl7")
+surface_material_override/0 = SubResource("ShaderMaterial_i5arm")
+script = ExtResource("5_bl5v0")
+camera = NodePath("../Camera3D")
+
+[node name="Sketchfab_Scene" parent="." instance=ExtResource("6_v1e8f")]
+transform = Transform3D(30, 0, 0, 0, 30, 0, 0, 0, 30, -0.627, -15.186, -305.405)
+metadata/_edit_group_ = true

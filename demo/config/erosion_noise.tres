@@ -1,0 +1,14 @@
+[gd_resource type="NoiseTexture2D" load_steps=2 format=3 uid="uid://dwxi3p3blv0vx"]
+
+[sub_resource type="FastNoiseLite" id="FastNoiseLite_jka67"]
+noise_type = 5
+frequency = 0.005
+fractal_octaves = 7
+domain_warp_fractal_octaves = 10
+domain_warp_fractal_lacunarity = -7.965
+domain_warp_fractal_gain = 0.995
+
+[resource]
+invert = true
+generate_mipmaps = false
+noise = SubResource("FastNoiseLite_jka67")
