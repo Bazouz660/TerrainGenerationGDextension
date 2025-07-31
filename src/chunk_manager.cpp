@@ -10,9 +10,9 @@
 using namespace godot;
 
 ChunkManager::ChunkManager(const TerrainConfig* terrain_config, MeshGenerator* mesh_gen,
-                          FoliageGenerator* foliage_gen, TerrainGenerator* terrain)
+                          FoliageGenerator* foliage_gen, RiverGenerator* river_gen, TerrainGenerator* terrain)
     : config(terrain_config), mesh_generator(mesh_gen), foliage_generator(foliage_gen),
-      terrain_node(terrain), cached_origin_position(Vector3(0, 0, 0)),
+      river_generator(river_gen), terrain_node(terrain), cached_origin_position(Vector3(0, 0, 0)),
       origin_position_valid(false), should_stop_thread(false), thread_running(false) {
 }
 
@@ -148,11 +148,44 @@ void ChunkManager::add_chunks_to_load(Vector3 origin_position) {
     if (chunk_state.load_index < chunk_state.load_candidates.size()) {
         const Vector2i& chunk_pos = chunk_state.load_candidates[chunk_state.load_index];
 
-        // Generate the base mesh
-        MeshInstance3D *chunk_mesh = mesh_generator->generate_chunk_mesh(chunk_pos);
+        // Get river segments that affect this chunk (for both carving and foliage exclusion)
+        std::vector<RiverSegment> carving_river_segments;
+        std::vector<RiverSegment> foliage_river_segments;
+        
+        if (river_generator) {
+            if (config->enable_river_carving) {
+                carving_river_segments = river_generator->get_river_segments_for_carving(chunk_pos);
+            }
+            // Always get river segments for foliage exclusion (separate from carving)
+            foliage_river_segments = river_generator->get_river_segments_for_foliage(chunk_pos);
+        }
 
-        // Add foliage to the chunk
-        foliage_generator->populate_chunk_foliage(chunk_mesh, chunk_pos);
+        // Generate the mesh with river carving if enabled, otherwise use standard generation
+        MeshInstance3D *chunk_mesh;
+        if (config->enable_river_carving && !carving_river_segments.empty()) {
+            chunk_mesh = mesh_generator->generate_chunk_mesh_with_rivers(chunk_pos, carving_river_segments);
+        } else {
+            chunk_mesh = mesh_generator->generate_chunk_mesh(chunk_pos);
+        }
+
+        // Add foliage to the chunk, excluding river areas
+        if (!foliage_river_segments.empty()) {
+            foliage_generator->populate_chunk_foliage_with_rivers(chunk_mesh, chunk_pos, foliage_river_segments);
+        } else {
+            foliage_generator->populate_chunk_foliage(chunk_mesh, chunk_pos);
+        }
+        
+        // Add river sources debug markers to the chunk
+        if (river_generator) {
+            river_generator->add_debug_sources_to_chunk(chunk_mesh, chunk_pos);
+            
+            // Add either proper river meshes or debug river segments
+            if (config->enable_river_mesh) {
+                river_generator->add_river_meshes_to_chunk(chunk_mesh, chunk_pos);
+            } else {
+                river_generator->add_debug_rivers_to_chunk(chunk_mesh, chunk_pos);
+            }
+        }
 
         loading_chunks.insert_or_assign(chunk_pos, chunk_mesh);
 

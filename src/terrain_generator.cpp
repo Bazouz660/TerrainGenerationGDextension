@@ -60,6 +60,71 @@ void TerrainGenerator::_bind_methods() {
     ClassDB::bind_method(D_METHOD("get_foliage_scene"), &TerrainGenerator::get_foliage_scene);
     ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "foliage_scene", PROPERTY_HINT_RESOURCE_TYPE, "PackedScene"), "set_foliage_scene", "get_foliage_scene");
 
+    ClassDB::bind_method(D_METHOD("set_river_source_texture", "_river_source_texture"), &TerrainGenerator::set_river_source_texture);
+    ClassDB::bind_method(D_METHOD("get_river_source_texture"), &TerrainGenerator::get_river_source_texture);
+    ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "river_source_texture", PROPERTY_HINT_RESOURCE_TYPE, "NoiseTexture2D"), "set_river_source_texture", "get_river_source_texture");
+
+    ClassDB::bind_method(D_METHOD("set_enable_river_carving", "_enable_river_carving"), &TerrainGenerator::set_enable_river_carving);
+    ClassDB::bind_method(D_METHOD("get_enable_river_carving"), &TerrainGenerator::get_enable_river_carving);
+    ADD_PROPERTY(PropertyInfo(Variant::BOOL, "enable_river_carving"), "set_enable_river_carving", "get_enable_river_carving");
+
+    ClassDB::bind_method(D_METHOD("set_river_carving_depth", "_river_carving_depth"), &TerrainGenerator::set_river_carving_depth);
+    ClassDB::bind_method(D_METHOD("get_river_carving_depth"), &TerrainGenerator::get_river_carving_depth);
+    ADD_PROPERTY(PropertyInfo(Variant::FLOAT, "river_carving_depth", PROPERTY_HINT_RANGE, "0.1, 10.0, 0.1"), "set_river_carving_depth", "get_river_carving_depth");
+
+    ClassDB::bind_method(D_METHOD("set_river_carving_width_multiplier", "_river_carving_width_multiplier"), &TerrainGenerator::set_river_carving_width_multiplier);
+    ClassDB::bind_method(D_METHOD("get_river_carving_width_multiplier"), &TerrainGenerator::get_river_carving_width_multiplier);
+    ADD_PROPERTY(PropertyInfo(Variant::FLOAT, "river_carving_width_multiplier", PROPERTY_HINT_RANGE, "1.0, 10.0, 0.1"), "set_river_carving_width_multiplier", "get_river_carving_width_multiplier");
+
+    ClassDB::bind_method(D_METHOD("set_river_carving_smoothness", "_river_carving_smoothness"), &TerrainGenerator::set_river_carving_smoothness);
+    ClassDB::bind_method(D_METHOD("get_river_carving_smoothness"), &TerrainGenerator::get_river_carving_smoothness);
+    ADD_PROPERTY(PropertyInfo(Variant::FLOAT, "river_carving_smoothness", PROPERTY_HINT_RANGE, "0.5, 5.0, 0.1"), "set_river_carving_smoothness", "get_river_carving_smoothness");
+
+    ClassDB::bind_method(D_METHOD("set_river_uphill_carving_multiplier", "_river_uphill_carving_multiplier"), &TerrainGenerator::set_river_uphill_carving_multiplier);
+    ClassDB::bind_method(D_METHOD("get_river_uphill_carving_multiplier"), &TerrainGenerator::get_river_uphill_carving_multiplier);
+    ADD_PROPERTY(PropertyInfo(Variant::FLOAT, "river_uphill_carving_multiplier", PROPERTY_HINT_RANGE, "1.0, 5.0, 0.1"), "set_river_uphill_carving_multiplier", "get_river_uphill_carving_multiplier");
+
+    ClassDB::bind_method(D_METHOD("set_river_max_turn_angle", "_river_max_turn_angle"), &TerrainGenerator::set_river_max_turn_angle);
+    ClassDB::bind_method(D_METHOD("get_river_max_turn_angle"), &TerrainGenerator::get_river_max_turn_angle);
+    ADD_PROPERTY(PropertyInfo(Variant::FLOAT, "river_max_turn_angle", PROPERTY_HINT_RANGE, "15.0, 90.0, 5.0"), "set_river_max_turn_angle", "get_river_max_turn_angle");
+
+    ClassDB::bind_method(D_METHOD("set_river_uphill_tolerance", "_river_uphill_tolerance"), &TerrainGenerator::set_river_uphill_tolerance);
+    ClassDB::bind_method(D_METHOD("get_river_uphill_tolerance"), &TerrainGenerator::get_river_uphill_tolerance);
+    ADD_PROPERTY(PropertyInfo(Variant::FLOAT, "river_uphill_tolerance", PROPERTY_HINT_RANGE, "0.0, 1.0, 0.05"), "set_river_uphill_tolerance", "get_river_uphill_tolerance");
+
+    ClassDB::bind_method(D_METHOD("set_river_max_stuck_attempts", "_river_max_stuck_attempts"), &TerrainGenerator::set_river_max_stuck_attempts);
+    ClassDB::bind_method(D_METHOD("get_river_max_stuck_attempts"), &TerrainGenerator::get_river_max_stuck_attempts);
+    ADD_PROPERTY(PropertyInfo(Variant::INT, "river_max_stuck_attempts", PROPERTY_HINT_RANGE, "3, 10, 1"), "set_river_max_stuck_attempts", "get_river_max_stuck_attempts");
+
+    ClassDB::bind_method(D_METHOD("set_foliage_river_exclusion_radius", "_foliage_river_exclusion_radius"), &TerrainGenerator::set_foliage_river_exclusion_radius);
+    ClassDB::bind_method(D_METHOD("get_foliage_river_exclusion_radius"), &TerrainGenerator::get_foliage_river_exclusion_radius);
+    ADD_PROPERTY(PropertyInfo(Variant::FLOAT, "foliage_river_exclusion_radius", PROPERTY_HINT_RANGE, "0.0, 20.0, 0.5"), "set_foliage_river_exclusion_radius", "get_foliage_river_exclusion_radius");
+
+    // River mesh generation properties
+    ClassDB::bind_method(D_METHOD("set_enable_river_mesh", "_enable_river_mesh"), &TerrainGenerator::set_enable_river_mesh);
+    ClassDB::bind_method(D_METHOD("get_enable_river_mesh"), &TerrainGenerator::get_enable_river_mesh);
+    ADD_PROPERTY(PropertyInfo(Variant::BOOL, "enable_river_mesh"), "set_enable_river_mesh", "get_enable_river_mesh");
+
+    ClassDB::bind_method(D_METHOD("set_river_mesh_depth_offset", "_river_mesh_depth_offset"), &TerrainGenerator::set_river_mesh_depth_offset);
+    ClassDB::bind_method(D_METHOD("get_river_mesh_depth_offset"), &TerrainGenerator::get_river_mesh_depth_offset);
+    ADD_PROPERTY(PropertyInfo(Variant::FLOAT, "river_mesh_depth_offset", PROPERTY_HINT_RANGE, "-5.0, 2.0, 0.1"), "set_river_mesh_depth_offset", "get_river_mesh_depth_offset");
+
+    ClassDB::bind_method(D_METHOD("set_river_mesh_width_multiplier", "_river_mesh_width_multiplier"), &TerrainGenerator::set_river_mesh_width_multiplier);
+    ClassDB::bind_method(D_METHOD("get_river_mesh_width_multiplier"), &TerrainGenerator::get_river_mesh_width_multiplier);
+    ADD_PROPERTY(PropertyInfo(Variant::FLOAT, "river_mesh_width_multiplier", PROPERTY_HINT_RANGE, "0.5, 5.0, 0.1"), "set_river_mesh_width_multiplier", "get_river_mesh_width_multiplier");
+
+    ClassDB::bind_method(D_METHOD("set_river_mesh_bank_safety", "_river_mesh_bank_safety"), &TerrainGenerator::set_river_mesh_bank_safety);
+    ClassDB::bind_method(D_METHOD("get_river_mesh_bank_safety"), &TerrainGenerator::get_river_mesh_bank_safety);
+    ADD_PROPERTY(PropertyInfo(Variant::FLOAT, "river_mesh_bank_safety", PROPERTY_HINT_RANGE, "0.0, 1.0, 0.05"), "set_river_mesh_bank_safety", "get_river_mesh_bank_safety");
+
+    ClassDB::bind_method(D_METHOD("set_river_mesh_subdivisions", "_river_mesh_subdivisions"), &TerrainGenerator::set_river_mesh_subdivisions);
+    ClassDB::bind_method(D_METHOD("get_river_mesh_subdivisions"), &TerrainGenerator::get_river_mesh_subdivisions);
+    ADD_PROPERTY(PropertyInfo(Variant::INT, "river_mesh_subdivisions", PROPERTY_HINT_RANGE, "4, 20, 1"), "set_river_mesh_subdivisions", "get_river_mesh_subdivisions");
+
+    ClassDB::bind_method(D_METHOD("set_river_material", "_river_material"), &TerrainGenerator::set_river_material);
+    ClassDB::bind_method(D_METHOD("get_river_material"), &TerrainGenerator::get_river_material);
+    ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "river_material", PROPERTY_HINT_RESOURCE_TYPE, "Material"), "set_river_material", "get_river_material");
+
     // Debug method for monitoring chunk memory usage
     ClassDB::bind_method(D_METHOD("get_chunk_stats"), &TerrainGenerator::get_chunk_stats);
 
@@ -69,7 +134,7 @@ void TerrainGenerator::_bind_methods() {
 
 TerrainGenerator::TerrainGenerator()
     : height_sampler(nullptr), mesh_generator(nullptr),
-      foliage_generator(nullptr), chunk_manager(nullptr) {
+      foliage_generator(nullptr), river_generator(nullptr), chunk_manager(nullptr) {
     recreate_components();
 }
 
@@ -81,6 +146,10 @@ TerrainGenerator::~TerrainGenerator() {
     if (foliage_generator) {
         delete foliage_generator;
         foliage_generator = nullptr;
+    }
+    if (river_generator) {
+        delete river_generator;
+        river_generator = nullptr;
     }
     if (mesh_generator) {
         delete mesh_generator;
@@ -102,6 +171,10 @@ void TerrainGenerator::recreate_components() {
         delete foliage_generator;
         foliage_generator = nullptr;
     }
+    if (river_generator) {
+        delete river_generator;
+        river_generator = nullptr;
+    }
     if (mesh_generator) {
         delete mesh_generator;
         mesh_generator = nullptr;
@@ -115,7 +188,9 @@ void TerrainGenerator::recreate_components() {
     height_sampler = new HeightSampler(&config);
     mesh_generator = new MeshGenerator(&config, height_sampler);
     foliage_generator = new FoliageGenerator(&config, height_sampler);
-    chunk_manager = new ChunkManager(&config, mesh_generator, foliage_generator, this);
+    river_generator = new RiverGenerator(&config, height_sampler);
+    
+    chunk_manager = new ChunkManager(&config, mesh_generator, foliage_generator, river_generator, this);
 }
 
 void TerrainGenerator::_ready() {
@@ -191,6 +266,165 @@ void TerrainGenerator::set_view_distance(int p_distance) {
 
 void TerrainGenerator::set_foliage_scene(Ref<PackedScene> p_scene) {
     config.foliage_scene = p_scene;
+}
+
+void TerrainGenerator::set_enable_river_carving(bool p_enable) {
+    if (config.enable_river_carving != p_enable) {
+        config.enable_river_carving = p_enable;
+        // River carving setting change requires reloading chunks
+        if (chunk_manager) {
+            chunk_manager->reload_chunks();
+        }
+    }
+}
+
+void TerrainGenerator::set_river_carving_depth(float p_depth) {
+    if (config.river_carving_depth != p_depth) {
+        config.river_carving_depth = p_depth;
+        // River carving parameter change requires reloading chunks
+        if (chunk_manager) {
+            chunk_manager->reload_chunks();
+        }
+    }
+}
+
+void TerrainGenerator::set_river_carving_width_multiplier(float p_multiplier) {
+    if (config.river_carving_width_multiplier != p_multiplier) {
+        config.river_carving_width_multiplier = p_multiplier;
+        // River carving parameter change requires reloading chunks
+        if (chunk_manager) {
+            chunk_manager->reload_chunks();
+        }
+    }
+}
+
+void TerrainGenerator::set_river_carving_smoothness(float p_smoothness) {
+    if (config.river_carving_smoothness != p_smoothness) {
+        config.river_carving_smoothness = p_smoothness;
+        // River carving parameter change requires reloading chunks
+        if (chunk_manager) {
+            chunk_manager->reload_chunks();
+        }
+    }
+}
+
+float TerrainGenerator::get_river_carving_smoothness() const {
+    return config.river_carving_smoothness;
+}
+
+void TerrainGenerator::set_river_uphill_carving_multiplier(float p_multiplier) {
+    if (config.river_uphill_carving_multiplier != p_multiplier) {
+        config.river_uphill_carving_multiplier = p_multiplier;
+        // River carving parameter change requires reloading chunks
+        if (chunk_manager) {
+            chunk_manager->reload_chunks();
+        }
+    }
+}
+
+float TerrainGenerator::get_river_uphill_carving_multiplier() const {
+    return config.river_uphill_carving_multiplier;
+}
+
+void TerrainGenerator::set_river_max_turn_angle(float p_angle) {
+    if (config.river_max_turn_angle != p_angle) {
+        config.river_max_turn_angle = p_angle;
+        // River flow parameter change requires reloading chunks
+        if (chunk_manager) {
+            chunk_manager->reload_chunks();
+        }
+    }
+}
+
+void TerrainGenerator::set_river_uphill_tolerance(float p_tolerance) {
+    if (config.river_uphill_tolerance != p_tolerance) {
+        config.river_uphill_tolerance = p_tolerance;
+        // River flow parameter change requires reloading chunks
+        if (chunk_manager) {
+            chunk_manager->reload_chunks();
+        }
+    }
+}
+
+void TerrainGenerator::set_river_max_stuck_attempts(int p_attempts) {
+    if (config.river_max_stuck_attempts != p_attempts) {
+        config.river_max_stuck_attempts = p_attempts;
+        // River flow parameter change requires reloading chunks
+        if (chunk_manager) {
+            chunk_manager->reload_chunks();
+        }
+    }
+}
+
+void TerrainGenerator::set_foliage_river_exclusion_radius(float p_radius) {
+    if (config.foliage_river_exclusion_radius != p_radius) {
+        config.foliage_river_exclusion_radius = p_radius;
+        // Foliage parameter change requires reloading chunks
+        if (chunk_manager) {
+            chunk_manager->reload_chunks();
+        }
+    }
+}
+
+// River mesh generation setters
+void TerrainGenerator::set_enable_river_mesh(bool p_enable) {
+    if (config.enable_river_mesh != p_enable) {
+        config.enable_river_mesh = p_enable;
+        // River mesh setting change requires reloading chunks
+        if (chunk_manager) {
+            chunk_manager->reload_chunks();
+        }
+    }
+}
+
+void TerrainGenerator::set_river_mesh_depth_offset(float p_offset) {
+    if (config.river_mesh_depth_offset != p_offset) {
+        config.river_mesh_depth_offset = p_offset;
+        // River mesh parameter change requires reloading chunks
+        if (chunk_manager) {
+            chunk_manager->reload_chunks();
+        }
+    }
+}
+
+void TerrainGenerator::set_river_mesh_width_multiplier(float p_multiplier) {
+    if (config.river_mesh_width_multiplier != p_multiplier) {
+        config.river_mesh_width_multiplier = p_multiplier;
+        // River mesh parameter change requires reloading chunks
+        if (chunk_manager) {
+            chunk_manager->reload_chunks();
+        }
+    }
+}
+
+void TerrainGenerator::set_river_mesh_bank_safety(float p_safety) {
+    if (config.river_mesh_bank_safety != p_safety) {
+        config.river_mesh_bank_safety = p_safety;
+        // River mesh parameter change requires reloading chunks
+        if (chunk_manager) {
+            chunk_manager->reload_chunks();
+        }
+    }
+}
+
+void TerrainGenerator::set_river_mesh_subdivisions(int p_subdivisions) {
+    if (config.river_mesh_subdivisions != p_subdivisions) {
+        config.river_mesh_subdivisions = p_subdivisions;
+        // River mesh parameter change requires reloading chunks
+        if (chunk_manager) {
+            chunk_manager->reload_chunks();
+        }
+    }
+}
+
+void TerrainGenerator::set_river_material(const Ref<Material>& p_material) {
+    if (config.river_material != p_material) {
+        config.river_material = p_material;
+        // River material change requires reloading chunks
+        if (chunk_manager) {
+            chunk_manager->reload_chunks();
+        }
+    }
 }
 
 void TerrainGenerator::reload_chunks() {

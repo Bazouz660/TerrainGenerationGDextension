@@ -1,0 +1,70 @@
+[gd_resource type="ShaderMaterial" load_steps=8 format=3 uid="uid://lb1be6m3ics3"]
+
+[ext_resource type="Shader" uid="uid://bb6pwryg8spmt" path="res://shader/water.gdshader" id="1_ajxiu"]
+
+[sub_resource type="FastNoiseLite" id="FastNoiseLite_i5arm"]
+frequency = 0.0079
+
+[sub_resource type="NoiseTexture2D" id="NoiseTexture2D_wc5p8"]
+generate_mipmaps = false
+seamless = true
+seamless_blend_skirt = 1.0
+noise = SubResource("FastNoiseLite_i5arm")
+
+[sub_resource type="Curve" id="Curve_6iypd"]
+_data = [Vector2(0, 0), 0.0, 0.0, 0, 0, Vector2(1, 1), 0.0, 0.0, 0, 0]
+point_count = 2
+
+[sub_resource type="CurveTexture" id="CurveTexture_tereu"]
+curve = SubResource("Curve_6iypd")
+
+[sub_resource type="FastNoiseLite" id="FastNoiseLite_cdqbm"]
+seed = 780
+frequency = 0.0069
+fractal_type = 2
+
+[sub_resource type="NoiseTexture2D" id="NoiseTexture2D_imku0"]
+width = 1024
+height = 1024
+seamless = true
+as_normal_map = true
+bump_strength = 4.0
+noise = SubResource("FastNoiseLite_cdqbm")
+
+[resource]
+render_priority = 0
+shader = ExtResource("1_ajxiu")
+shader_parameter/absorption_color = Color(1, 0.71416, 0.615381, 1)
+shader_parameter/fresnel_radius = 2.0
+shader_parameter/fresnel_color = Color(4.04298e-06, 0.56779, 0.712761, 1)
+shader_parameter/roughness = 0.15
+shader_parameter/specular = 0.25
+shader_parameter/depth_distance = 25.0
+shader_parameter/beers_law = 1.0
+shader_parameter/shore_transparency_distance = 0.2
+shader_parameter/min_water_alpha = 0.0
+shader_parameter/displacement_strength = 0.3
+shader_parameter/displacement_scroll_speed = 0.1
+shader_parameter/displacement_scroll_offset = Vector2(-0.2, 0.3)
+shader_parameter/displacement_scale_offset = 0.5
+shader_parameter/displacement_scale = Vector2(0.04, 0.04)
+shader_parameter/edge_thickness = 0.3
+shader_parameter/edge_speed = 0.35
+shader_parameter/edge_noise_scale = Vector2(0.4, 0.4)
+shader_parameter/edge_noise = SubResource("NoiseTexture2D_wc5p8")
+shader_parameter/edge_ramp = SubResource("CurveTexture_tereu")
+shader_parameter/caustic_size = 2.0
+shader_parameter/caustic_range = 40.0
+shader_parameter/caustic_strength = 0.08
+shader_parameter/ssr_mix_strength = 0.65
+shader_parameter/ssr_travel = 300.0
+shader_parameter/ssr_resolution_near = 5.0
+shader_parameter/ssr_resolution_far = 10.0
+shader_parameter/ssr_tolerance = 2.0
+shader_parameter/refraction_strength = 1.25
+shader_parameter/normal_map_strength = 1.0
+shader_parameter/scroll_speed = 0.05
+shader_parameter/scroll_offset = Vector2(0.1, -0.3)
+shader_parameter/scale_offset = 0.5
+shader_parameter/normal_map_scale = Vector2(0.1, 0.1)
+shader_parameter/normal_map = SubResource("NoiseTexture2D_imku0")

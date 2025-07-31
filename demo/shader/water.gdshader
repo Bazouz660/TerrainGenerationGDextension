@@ -1,5 +1,5 @@
 shader_type spatial;
-render_mode shadows_disabled;
+render_mode shadows_disabled, blend_mix, depth_draw_always, cull_disabled, diffuse_burley, specular_schlick_ggx;
 
 #define CAUSTICS
 #define FRESNEL
@@ -18,6 +18,9 @@ uniform float specular : hint_range(0.0, 1.0, 0.01) = 0.25;
 // Depth adjustment
 uniform float depth_distance : hint_range(0.0, 50.0, 0.1) = 25.0;
 uniform float beers_law : hint_range(0.0, 20.0, 0.1) = 4.5;
+// Shore transparency
+uniform float shore_transparency_distance : hint_range(0.1, 10.0, 0.1) = 2.0;
+uniform float min_water_alpha : hint_range(0.0, 1.0, 0.01) = 0.1;
 
 #ifdef DISPLACEMENT
 group_uniforms displacement;
@@ -163,9 +166,11 @@ float fresnel(vec3 normal, vec3 view) {
 #endif
 
 
-vec2 refract_uv(inout vec2 uv, vec3 normal, float depth){
-	float strength1 = refraction_strength * depth;
-	uv += fma(strength1, length(normal), strength1 * -1.2);
+vec2 refract_uv(inout vec2 uv, vec3 normal, float depth_factor){
+	// Normal map is already in [0,1] range, convert to [-1,1] for proper distortion
+	vec2 normal_offset = (normal.xy * 2.0 - 1.0);
+	// Apply refraction with proper scaling (removed the 0.01 multiplier that was too small)
+	uv += normal_offset * refraction_strength * depth_factor * 0.1;
 	return uv;
 }
 
@@ -231,10 +236,18 @@ void fragment() {
 
 	// Create Edge caused by other Objects
 	float edge_blend = clamp(relative_depth / -edge_thickness + 1.0, 0.0, 1.0);
+
+	// Check if we're close to another water surface to reduce edge effects between water layers
+	float water_layer_factor = 1.0;
+	if (relative_depth < edge_thickness * 2.0) {
+		// We might be close to another water surface, reduce edge effect
+		water_layer_factor = smoothstep(0.0, edge_thickness * 2.0, relative_depth);
+	}
+
 	vec2 edge_noise_uv = global_position.xz * edge_noise_scale * fma(normalized_wind_direction.xz, vec2(0.5), vec2(0.5));
 	edge_noise_uv = fma(-normalized_wind_direction.xz * TIME * edge_speed, vec2(wind_intens_factor), edge_noise_uv);
 	float edge_noise_sample = texture(edge_noise, edge_noise_uv).r;
-	float edge_mask = normalize( texture(edge_ramp, vec2(edge_noise_sample * fma(edge_blend, -1., 1.))).r);
+	float edge_mask = normalize( texture(edge_ramp, vec2(edge_noise_sample * fma(edge_blend, -1., 1.))).r) * water_layer_factor;
 
 	// Create Ripples caused by player
 	float player_effect_mask = 0.0;
@@ -253,10 +266,17 @@ void fragment() {
 	// Calculate Fragment Depth
 	vec4 clip_pos = PROJECTION_MATRIX * vec4(VERTEX, 1.0);
 	clip_pos.xyz /= clip_pos.w;
-	DEPTH = clip_pos.z;
+	float current_fragment_depth = clip_pos.z;
+	DEPTH = current_fragment_depth;
+
 	// Refract UV
 	vec2 refracted_uv = SCREEN_UV;
-	refract_uv(refracted_uv, NORMAL_MAP, sqrt(DEPTH) * relative_depth);
+	// Use a more consistent depth factor that doesn't depend on fragment depth
+	float refraction_depth_factor = clamp(relative_depth * 0.5, 0.3, 2.0);
+	// Add view angle dependency for more realistic refraction
+	float view_factor = 1.0 - abs(dot(normalize(VIEW), NORMAL));
+	refraction_depth_factor *= mix(0.5, 1.0, view_factor);
+	refract_uv(refracted_uv, NORMAL_MAP, refraction_depth_factor);
 
 	vec3 screen;
 	float depth_blend;
@@ -283,9 +303,29 @@ void fragment() {
 	Sometimes the Water Refraction would cause the sampling of a screen position that is either
 	outside the screen bounds or where another object is infront of the water.
 	Switching back to the unrefracted SCREEN_UV fixes that.
+	Also check if we're looking at another water surface that's closer to avoid seeing through stacked water meshes.
 	*/
 
-	if (depth_test > -0.0001 && in_bounds(refracted_uv)) {
+	// Check if the refracted sample is valid and not sampling another closer water surface
+	bool use_refracted = depth_test > 0.01 && in_bounds(refracted_uv);
+
+	// Additional check: ensure we're not sampling from a closer water surface
+	if (use_refracted) {
+		// If the refracted depth is close to our current depth, we might be sampling another water surface
+		// Use a larger threshold to be more aggressive about detecting overlapping water
+		float depth_difference = abs(refracted_depth_tex - current_fragment_depth);
+
+		// Also check if the refracted sample is at nearly the same world position
+		vec3 refracted_world_pos = world.xyz;
+		float world_distance = length(refracted_world_pos.xz - global_position.xz);
+
+		if (depth_difference < 0.001 || refracted_depth_tex >= current_fragment_depth ||
+		    (world_distance < 0.1 && depth_difference < 0.01)) {
+			use_refracted = false;
+		}
+	}
+
+	if (use_refracted) {
 		screen = texture(screen_texture, refracted_uv).rgb * 0.9;
 		depth_blend = clamp(depth_test / depth_distance, 0.0, 1.0);
 		depth_blend = fma(exp(-depth_blend * beers_law), -1.0, 1.0);
@@ -336,7 +376,20 @@ void fragment() {
 	color = mix(color, sampled_color, alpha_hit * (1.0 - roughness) * ssr_mix_strength);
 	#endif
 	color = mix(color, vec3(0.98), ripple_mask); // Apply Ripples
+
+	// Calculate shore transparency for better blending
+	// Use relative_depth (preserves water-on-water detection) for shore transparency
+	float shore_blend = clamp(relative_depth / shore_transparency_distance, 0.0, 1.0);
+
+	// Only apply transparency within the shore transparency distance
+	float final_alpha = 1.0;
+	if (relative_depth < shore_transparency_distance) {
+		final_alpha = mix(min_water_alpha, 1.0, shore_blend);
+	}
+
 	ALBEDO = color;
+
+	ALPHA = final_alpha;
 	ROUGHNESS = roughness;
 	SPECULAR = specular;
 }

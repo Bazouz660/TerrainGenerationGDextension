@@ -7,6 +7,7 @@
 #include "terrain_config.h"
 #include "mesh_generator.h"
 #include "foliage_generator.h"
+#include "river_generator.h"
 #include "safe_queue.h"
 #include "safe_unordered_map.h"
 #include <thread>
@@ -30,6 +31,7 @@ private:
     const TerrainConfig* config;
     MeshGenerator* mesh_generator;
     FoliageGenerator* foliage_generator;
+    RiverGenerator* river_generator;
     TerrainGenerator* terrain_node; // For adding/removing children
 
     SafeUnorderedMap<Vector2i, MeshInstance3D*, Vector2iHash> loading_chunks;
@@ -47,7 +49,7 @@ private:
 
 public:
     ChunkManager(const TerrainConfig* terrain_config, MeshGenerator* mesh_gen,
-                 FoliageGenerator* foliage_gen, TerrainGenerator* terrain);
+                 FoliageGenerator* foliage_gen, RiverGenerator* river_gen, TerrainGenerator* terrain);
     ~ChunkManager();
 
     void start_thread();

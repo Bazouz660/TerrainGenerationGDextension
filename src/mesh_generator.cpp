@@ -2,6 +2,7 @@
 // mesh_generator.cpp
 //==========================================
 #include "mesh_generator.h"
+#include "river_generator.h"
 #include <godot_cpp/classes/surface_tool.hpp>
 #include <godot_cpp/classes/array_mesh.hpp>
 
@@ -21,6 +22,39 @@ MeshInstance3D* MeshGenerator::generate_chunk_mesh(Vector2i position) {
     PackedFloat32Array height_data;
     height_data.resize(extended_size * extended_size);
     height_sampler->precompute_height_data(position, step, extended_size, height_data);
+
+    generate_vertices(extended_size, height_data, step, st);
+    generate_indices(st);
+
+    auto mesh = st->commit();
+    memdelete(st);
+
+    MeshInstance3D *mesh_instance = memnew(MeshInstance3D);
+    mesh_instance->set_mesh(mesh);
+
+    float chunk_world_x = position.x * config->width;
+    float chunk_world_z = position.y * config->width;
+    mesh_instance->set_position(Vector3(chunk_world_x, 0, chunk_world_z));
+
+    if (!config->terrain_material.is_null()) {
+        mesh_instance->set_material_override(config->terrain_material);
+    }
+
+    return mesh_instance;
+}
+
+MeshInstance3D* MeshGenerator::generate_chunk_mesh_with_rivers(Vector2i position, const std::vector<RiverSegment>& river_segments) {
+    auto st = memnew(SurfaceTool);
+    st->begin(Mesh::PRIMITIVE_TRIANGLES);
+
+    float step = config->width / (float)config->segment_count;
+    int extended_size = config->segment_count + 3;
+
+    PackedFloat32Array height_data;
+    height_data.resize(extended_size * extended_size);
+    
+    // Use river-aware height sampling
+    height_sampler->precompute_height_data_with_rivers(position, step, extended_size, height_data, river_segments);
 
     generate_vertices(extended_size, height_data, step, st);
     generate_indices(st);
